@@ -18,9 +18,9 @@ class FixedDropout(Dropout):
 # ------------ Mapping Model ------------
 
 MODEL_LINKS = {
-    "adam_fold2 (1).h5": "https://drive.google.com/1Ig-2S3q0fJsP996UFRhvC3TG4i8P1Wrv",
-    "model_cnn_aug.h5": "https://drive.google.com/17kJ-clysgvI5bKbwEyGGD41_c8VzHt0P",
-    "sgd_fold5.h5": "https://drive.google.com/1kKMBnrw1dmMwHHZCjwtHkxXT4kIESJTi",
+    "adam_fold2 (1).h5": "https://drive.google.com/uc?id=1Ig-2S3q0fJsP996UFRhvC3TG4i8P1Wrv",
+    "model_cnn_aug.h5": "https://drive.google.com/uc?id=17kJ-clysgvI5bKbwEyGGD41_c8VzHt0P",
+    "sgd_fold5.h5": "https://drive.google.com/uc?id=1kKMBnrw1dmMwHHZCjwtHkxXT4kIESJTi",
 }
 
 MODEL_DIR = "models"
@@ -104,3 +104,4 @@ if camera_image is not None:
     img = Image.open(camera_image).convert("RGB")
     st.image(img, caption="Gambar dari kamera HP", use_container_width=True)
     predict_image(img, model)
+
