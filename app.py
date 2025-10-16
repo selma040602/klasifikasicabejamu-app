@@ -1,7 +1,7 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from PIL import Image, ImageEnhance
+from PIL import Image
 from tensorflow.keras.layers import Dropout
 import time
 import os
@@ -112,52 +112,17 @@ def auto_zoom_to_object(img, zoom_factor=1.8):
     return zoom_image(img, zoom_factor)
 
 
-# ------------ FUNGSI PREPROCESSING SEDANG ------------
-def preprocess_image_moderate(img):
-    """
-    Preprocessing sedang - lebih seimbang
-    """
-    # Convert to array for OpenCV processing
-    img_array = np.array(img)
-    
-    # 1. Bilateral Filter - Smooth tapi tetap jaga edge
-    img_array = cv2.bilateralFilter(img_array, 9, 75, 75)
-    
-    # 2. CLAHE dengan parameter lebih soft
-    lab = cv2.cvtColor(img_array, cv2.COLOR_RGB2LAB)
-    l, a, b = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    l = clahe.apply(l)
-    lab = cv2.merge([l, a, b])
-    img_array = cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
-    
-    img = Image.fromarray(img_array)
-    
-    # 3. Enhancement PIL
-    enhancer = ImageEnhance.Sharpness(img)
-    img = enhancer.enhance(1.5)
-    
-    enhancer = ImageEnhance.Contrast(img)
-    img = enhancer.enhance(1.3)
-    
-    return img
-
-
 # ---------------- FUNGSI PREDIKSI ----------------
 def predict_image(img, model):
     # Tampilkan gambar original
     st.image(img, caption="Gambar Input", use_container_width=True)
     
-    # Apply zoom otomatis
-    img_to_process = img.copy()
-    img_to_process = auto_zoom_to_object(img_to_process, zoom_factor=1.8)
+    # Apply zoom otomatis (tanpa preprocessing)
+    img_zoomed = auto_zoom_to_object(img, zoom_factor=1.8)
     
-    # Preprocessing sedang
-    img_processed = preprocess_image_moderate(img_to_process)
-    
-    # Preprocessing untuk model
+    # Resize untuk model
     img_size = model.input_shape[1:3]
-    img_resized = img_processed.resize(img_size, Image.Resampling.LANCZOS)
+    img_resized = img_zoomed.resize(img_size, Image.Resampling.LANCZOS)
     img_array = np.array(img_resized).astype("float32") / 255.0
     img_array = np.expand_dims(img_array, axis=0)
     
@@ -195,7 +160,7 @@ def predict_image(img, model):
 
 # ------------ UI Streamlit ------------
 st.title("🌶 Klasifikasi Cabe Jamu: Segar atau Busuk")
-st.write("**Enhanced Version** dengan auto-zoom dan preprocessing untuk akurasi lebih tinggi")
+st.write("**Zoom Version** - Auto-zoom ke objek cabai tanpa preprocessing")
 
 # Dropdown pilih model
 model_choice = st.selectbox(
@@ -232,5 +197,5 @@ st.info("""
 2. Fokus pada objek cabai, hindari background yang ramai
 3. Ambil foto dari jarak yang cukup dekat
 4. Pastikan cabai terlihat jelas, tidak blur
-5. Sistem secara otomatis akan mendeteksi dan zoom ke objek cabai untuk hasil terbaik
+5. Sistem secara otomatis akan mendeteksi dan zoom ke objek cabai
 """)
